@@ -1104,7 +1104,7 @@ build_postgres() {
     --without-readline \
     --without-zlib
 
-  make $EXTRA_MAKEFLAGS install
+  make $EXTRA_MAKEFLAGS MAKELEVEL=0 install
   popd
 }
 
