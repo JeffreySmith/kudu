@@ -31,7 +31,12 @@ from kudu.schema import (Schema,
 import kudu
 import datetime
 import time
-from pytz import utc
+import sys
+if sys.version_info >= (3,9):
+    from zoneinfo import ZoneInfo
+    utc = ZoneInfo("utc")
+else:
+    from pytz import utc
 try:
     from urllib.error import HTTPError
     from urllib.request import Request, urlopen

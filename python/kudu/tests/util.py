@@ -23,7 +23,13 @@ from kudu.client import Partitioning
 from kudu.tests.common import KuduTestBase
 import kudu
 import datetime
-import pytz
+import sys
+if sys.version >= (3,9):
+    from zoneinfo import ZoneInfo
+    utc = ZoneInfo("utc")
+else:
+    import pytz
+    from pytz import utc
 
 class TestScanBase(KuduTestBase, CompatUnitTest):
 
@@ -45,7 +51,7 @@ class TestScanBase(KuduTestBase, CompatUnitTest):
             tup = i, \
                   i * 2, \
                   'hello_%d' % i if i % 2 == 0 else None, \
-                  datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+                  datetime.datetime.utcnow().replace(tzinfo=utc)
             op['key'] = tup[0]
             op['int_val'] = tup[1]
             if i % 2 == 0:
@@ -102,22 +108,22 @@ class TestScanBase(KuduTestBase, CompatUnitTest):
         # Insert new rows
         if kudu.CLIENT_SUPPORTS_DECIMAL:
             self.type_test_rows = [
-                (1, datetime.datetime(2016, 1, 1).replace(tzinfo=pytz.utc), Decimal('111.11'),
+                (1, datetime.datetime(2016, 1, 1).replace(tzinfo=utc), Decimal('111.11'),
                  "Test One", True, 1.7976931348623157 * (10^308), 127,
                  b'\xce\x99\xce\xbf\xcf\x81\xce\xb4\xce\xb1\xce\xbd\xce\xaf\xce\xb1',
                  "Test One", datetime.date(1970,1,1), 3.402823 * (10^38)),
-                (2, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), Decimal('0.99'),
+                (2, datetime.datetime.utcnow().replace(tzinfo=utc), Decimal('0.99'),
                  "测试二", False, 200.1, -1,
                  b'\xd0\x98\xd0\xbe\xd1\x80\xd0\xb4\xd0\xb0\xd0\xbd\xd0\xb8\xd1\x8f',
                  "测试二", datetime.date(2020,1,1), -150.2)
             ]
         else:
             self.type_test_rows = [
-                (1, datetime.datetime(2016, 1, 1).replace(tzinfo=pytz.utc),
+                (1, datetime.datetime(2016, 1, 1).replace(tzinfo=utc),
                  "Test One", True, 1.7976931348623157 * (10 ^ 308), 127,
                  b'\xce\x99\xce\xbf\xcf\x81\xce\xb4\xce\xb1\xce\xbd\xce\xaf\xce\xb1',
                  "Test One", datetime.date(1970,1,1), 3.402823 * (10 ^ 38)),
-                (2, datetime.datetime.utcnow().replace(tzinfo=pytz.utc),
+                (2, datetime.datetime.utcnow().replace(tzinfo=utc),
                  "测试二", False, 200.1, -1,
                  b'\xd0\x98\xd0\xbe\xd1\x80\xd0\xb4\xd0\xb0\xd0\xbd\xd0\xb8\xd1\x8f',
                  "测试二", datetime.date(2020,1,1), -150.2)
@@ -147,8 +153,10 @@ class TestScanBase(KuduTestBase, CompatUnitTest):
         # Insert new rows
         # Also test a timezone other than UTC to confirm that
         # conversion to UTC is properly applied
-        eastern = datetime.datetime.now()\
-            .replace(tzinfo=pytz.timezone("America/New_York"))
+        if sys.version_info >= (3,9):
+            eastern = datetime.datetime.now(tzinfo=ZoneInfo("America/New_York"))
+        else:
+            eastern = pytz.timezone("America/New_York").localize(datetime.datetime.now())
         rows = [[100, "2016-09-14T23:11:32.432019"],
                 [101, ("2016-09-15", "%Y-%m-%d")],
                 [102, eastern]]
@@ -174,7 +182,7 @@ class TestScanBase(KuduTestBase, CompatUnitTest):
                 # Convert Eastern Time datetime to UTC for confirmation
                 list[3] -= list[3].utcoffset()
             # Apply timezone
-            list[3] = list[3].replace(tzinfo=pytz.utc)
+            list[3] = list[3].replace(tzinfo=utc)
             self.tuples.append(tuple(list))
         session.flush()
 

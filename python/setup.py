@@ -208,7 +208,7 @@ setup(
     tests_require=['pytest >=2.8,<3.3',
                    'pytest-timeout >=1.1.0,<1.2.1'],
 
-    install_requires=['cython >= 0.21', 'pytz', 'six'],
+    install_requires=['cython >= 0.21', 'pytz; python_version < "3.9.0"', 'six'],
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     license='Apache License, Version 2.0',
