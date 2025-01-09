@@ -21,7 +21,7 @@ from decimal import Decimal, getcontext
 import sys
 if sys.version_info >= (3,9):
     from zoneinfo import ZoneInfo
-    utc = ZoneInfo("utc")
+    utc = ZoneInfo("UTC")
 else:
     from pytz import utc
 

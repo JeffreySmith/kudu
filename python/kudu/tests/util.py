@@ -24,9 +24,9 @@ from kudu.tests.common import KuduTestBase
 import kudu
 import datetime
 import sys
-if sys.version >= (3,9):
+if sys.version_info >= (3,9):
     from zoneinfo import ZoneInfo
-    utc = ZoneInfo("utc")
+    utc = ZoneInfo("UTC")
 else:
     import pytz
     from pytz import utc
