@@ -154,7 +154,7 @@ class TestScanBase(KuduTestBase, CompatUnitTest):
         # Also test a timezone other than UTC to confirm that
         # conversion to UTC is properly applied
         if sys.version_info >= (3,9):
-            eastern = datetime.datetime.now(tzinfo=ZoneInfo("America/New_York"))
+            eastern = datetime.datetime.now(tz=ZoneInfo("America/New_York"))
         else:
             eastern = pytz.timezone("America/New_York").localize(datetime.datetime.now())
         rows = [[100, "2016-09-14T23:11:32.432019"],
